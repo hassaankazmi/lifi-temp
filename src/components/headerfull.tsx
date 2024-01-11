@@ -10,6 +10,7 @@ import Dropdown1 from "../components/dropdown";
 import { Dropdown } from 'flowbite';
 import dai1 from "../images/dai1.svg";
 import trinew from "../images/trinew.svg";
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 interface MyComponentProps {
     name: string;
@@ -182,10 +183,12 @@ const Headerfull: React.FC<MyComponentProps> = ({ name }) => {
                     </div>
 
                     <div className='flex items-center gap-[5px] lg:gap-[10px]'>
-                        <Dropdown1 />
+                        {/* <Dropdown1 /> */}
 
                         <div className='ml-[0px] lg:ml-[12px]'>
-                            <button className='bg-[#424242] py-[10px] px-[8px] lg:px-[12px] rounded-full leading-0 text-[#b1b2ff] text-[14px] lg:text-[16px] font-medium '><span className='text-gradient'>Connect Wallet</span></button>
+                        <ConnectButton showBalance={{ smallScreen: true, largeScreen: true }}
+                                accountStatus={{ smallScreen: 'avatar', largeScreen: 'full',  }} />
+                            {/* <button className='bg-[#424242] py-[10px] px-[8px] lg:px-[12px] rounded-full leading-0 text-[#b1b2ff] text-[14px] lg:text-[16px] font-medium '><span className='text-gradient'>Connect Wallet</span></button> */}
 
                         </div>
                         <div id="mobile-menu" className={isMenuOpen ? 'pl-[16px] md:hidden mr-[20px] pt-[15px] block space-y-1 px-4 pb-10 pt-2 fixed top-0 left-0 z-30 w-full h-full bg-[#181819] z-[999999]' : 'md:hidden mr-[0px] mt-[0px]'}>
