@@ -6,16 +6,22 @@ import eth from "../images/eth.svg";
 import eth1 from "../images/ethdrop.svg";
 import eth2 from "../images/ethdrop1.svg";
 import ava from "../images/ava.jpeg";
+import tc from "../images/tc.png";
 import Dropdown1 from "../components/dropdown";
 import { Dropdown } from 'flowbite';
 import dai1 from "../images/dai1.svg";
 import trinew from "../images/trinew.svg";
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { ConnectButton, useAccountModal, useChainModal, useConnectModal } from '@rainbow-me/rainbowkit';
+import { useAccount, useChainId, useSwitchNetwork } from 'wagmi';
 
 interface MyComponentProps {
     name: string;
 }
 
+declare module '*.png' {
+    const src: string;
+}
+  
 const Headerfull: React.FC<MyComponentProps> = ({ name }) => {
     const [search, setSearch] = useState<string>("");
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -33,6 +39,56 @@ const Headerfull: React.FC<MyComponentProps> = ({ name }) => {
         }
     };
 
+    const { openConnectModal } = useConnectModal();
+    const { openAccountModal } = useAccountModal();
+    const { openChainModal } = useChainModal();
+
+    const useAccount_ = useAccount();
+    console.log("🚀 ~ Home ~ useAccount:", useAccount_);
+    const chainId = useChainId();
+    console.log("🚀 ~ Home ~ chainId:", chainId);
+    const { chains, switchNetwork } = useSwitchNetwork();
+    console.log("🚀 ~ Home ~ switchNetwork:", chains);
+    const networkName = (chains: any) => {
+        
+        const foundChain = chains.find((chains: any) => chains.id === chainId);
+        console.log("🚀 ~ networkName ~ foundChain:", foundChain)
+        if (foundChain) {
+            return foundChain;
+        } else {
+            return '';
+        }
+    }
+
+    const networkName_1 = networkName(chains);
+    console.log("🚀 ~ networkName ~ networkName:", networkName_1)
+
+    const selectedChain = networkName(chains);
+    console.log("🚀 ~ networkName ~ selectedChain:", selectedChain)
+
+
+    const truncateAddress = (address:any, length = 6) => {
+        if (!address) return '';
+        
+        const prefixLength = length;
+        const suffixLength = length;
+        
+        const prefix = address.substring(0, prefixLength);
+        const suffix = address.substring(address.length - suffixLength);
+      
+        return `${prefix}...${suffix}`;
+      };
+
+      const address = useAccount_.address;
+    
+      const useAccount_1 = {
+        address: address // Replace with your actual address
+      };
+    
+    const truncatedAddress = truncateAddress(useAccount_.address);
+
+
+    // end
 
 
     const onSearchFocus = () => {
@@ -170,8 +226,6 @@ const Headerfull: React.FC<MyComponentProps> = ({ name }) => {
                                                 <a href="#" className="flex gap-3 text-white text-[16px] font-normal whitespace-nowrap"><img className="h-5.5 w-5 rounded-full border border-[#34373f]" src={trinew} alt="Your Company" />triangular Treasures
                                                 </a>
                                             </li>
-
-
                                         </ul>
                                     </div>
                                     {/* <a href='/compare' className='text-[#9b9b9b] font-medium py-[8px] px-[14px] hover:bg-[#1c1d21] rounded-xl cursor-pointer'>Compare</a> */}
@@ -185,12 +239,45 @@ const Headerfull: React.FC<MyComponentProps> = ({ name }) => {
                     <div className='flex items-center gap-[5px] lg:gap-[10px]'>
                         {/* <Dropdown1 /> */}
 
-                        <div className='ml-[0px] lg:ml-[12px]'>
-                        <ConnectButton showBalance={{ smallScreen: true, largeScreen: true }}
-                                accountStatus={{ smallScreen: 'avatar', largeScreen: 'full',  }} />
-                            {/* <button className='bg-[#424242] py-[10px] px-[8px] lg:px-[12px] rounded-full leading-0 text-[#b1b2ff] text-[14px] lg:text-[16px] font-medium '><span className='text-gradient'>Connect Wallet</span></button> */}
+                        {useAccount_.status === 'disconnected' ?
+                            (
+                                <div className='ml-[0px] lg:ml-[12px]'>
+                                {/* <ConnectButton showBalance={{ smallScreen: true, largeScreen: true }}
+                                    accountStatus={{ smallScreen: 'avatar', largeScreen: 'full', }} /> */}
+                                <button onClick={openConnectModal} className='bg-[#424242] py-[10px] px-[8px] lg:px-[12px] rounded-full leading-0 text-[#b1b2ff] text-[14px] lg:text-[16px] font-medium '><span className='text-gradient'>Connect Wallet</span></button>
 
-                        </div>
+                                </div>
+                            ) : (
+                                <div className='flex items-center pt-[3px]' > 
+                                <div className="relative ">
+                                        <button
+                                        onClick={openChainModal}
+                                        id="dropdownDefaultButtonhead"
+                                        data-dropdown-toggle="dropdownhead"
+                                        className="h_drop right-0 top-1 inline-flex items-center rounded-full
+                                        bg-[#202027] bg-transparent hover:bg-[#202027]
+                                        text-white rounded-xl px-2.5 py-2.5 text-md font-medium flex gap-1 focus:outline-none focus-visible:outline-none"
+                                        type="button"
+                                    >
+                                        <p className=""><img className="h-5.5 w-5 " src={selectedChain.iconUrl} alt="Your Company" /></p>
+                                        <svg className='h-5 w-6' xmlns="http://www.w3.org/2000/svg" version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 24 24"><g><path d="M18.7 7.2c-.4-.4-1-.4-1.4 0l-7.5 7.5-3.1-3.1c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4l3.8 3.8c.2.2.4.3.7.3s.5-.1.7-.3l8.2-8.2c.4-.4.4-1 0-1.4z" fill="#919192" opacity="1" data-original="#000000"></path></g></svg>
+                                    </button>
+
+                                    <div
+                                        id="dropdownhead"
+                                        className="z-10 bg-[#202027] divide-y divide-gray-100 rounded-b-xl shadow w-44 dark:bg-gray-700 w-[64px] top-[-22px] -translate-y-6 block"
+                                        data-popper-placement="bottom"
+                                    >
+
+                                    </div>
+                                </div>
+
+                                <div onClick={openAccountModal} className="cursor-pointer text-white text-[8px] sm:text-[16px] py-[10px] px-[12px]   rounded-full inline text-center font-normal  flex items-center gap-[8px] hover:bg-[#292929] "><img className='h-[20px] w-[20px] md:h-[24px] md:w-[24px] rounded-full' src={tc} />
+                                        <span className="font-[Lausanne] text-[12px] md:text-[15px] font-bold text-gradient ">{truncatedAddress}</span>
+                                </div>
+                                </div>
+                            )}
+                        
                         <div id="mobile-menu" className={isMenuOpen ? 'pl-[16px] md:hidden mr-[20px] pt-[15px] block space-y-1 px-4 pb-10 pt-2 fixed top-0 left-0 z-30 w-full h-full bg-[#181819] z-[999999]' : 'md:hidden mr-[0px] mt-[0px]'}>
                             <div className="lg:flex inset-y-0 left-0 justify-end flex items-center sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                                 <a href="#" className="bg-[#22232ac7] text-white rounded-xl px-2.5 py-2.5 text-md font-medium flex gap-2" aria-current="page" onClick={toggleMenu}>

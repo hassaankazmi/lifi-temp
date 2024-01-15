@@ -10,6 +10,7 @@ import ava from "../images/ava.jpeg";
 import Dropdown1 from "../components/dropdown";
 import dai1 from "../images/dai1.svg";
 import trinew from "../images/trinew.svg";
+import { useAccount, useChainId, useSwitchNetwork } from 'wagmi';
 interface MyComponentProps {
     name: string;
 }
@@ -20,6 +21,52 @@ const HeaderfullConnected: React.FC<MyComponentProps> = ({ name }) => {
     const [focused, setFocused] = useState(false);
     const [visibleDropDownMenu, setVisibleDropDownMenu] = useState(false);
     const [activeAccordion, setActiveAccordion] = useState(null);
+    
+    // Wagmi code 
+
+    const useAccount_ = useAccount();
+    const address = useAccount_.address;
+
+
+    const truncateAddress = (address:any, length = 6) => {
+        if (!address) return '';
+        
+        const prefixLength = length;
+        const suffixLength = length;
+        
+        const prefix = address.substring(0, prefixLength);
+        const suffix = address.substring(address.length - suffixLength);
+      
+        return `${prefix}...${suffix}`;
+      };
+
+      const useAccount_1 = {
+        address: address // Replace with your actual address
+      };
+    
+    const truncatedAddress = truncateAddress(useAccount_.address);
+    
+      const chainId = useChainId();
+      console.log("🚀 ~ Home ~ chainId:", chainId);
+      const { chains, switchNetwork } = useSwitchNetwork();
+      console.log("🚀 ~ Home ~ switchNetwork:", chains);
+    
+    const networkName = (chains: any) => {
+        
+        const foundChain = chains.find((chains: any) => chains.id === chainId);
+        console.log("🚀 ~ networkName ~ foundChain:", foundChain)
+        if (foundChain) {
+            return foundChain;
+        } else {
+            return '';
+        }
+    }
+
+    const selectedChain = networkName(chains);
+    console.log("🚀 ~ networkName ~ networkName:", selectedChain)
+    
+    // End
+
 
     const toggleAccordion = (accordionId: any) => {
         if (activeAccordion === accordionId) {
@@ -52,6 +99,8 @@ const HeaderfullConnected: React.FC<MyComponentProps> = ({ name }) => {
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };
+
+
     return (
 
 
@@ -184,7 +233,7 @@ const HeaderfullConnected: React.FC<MyComponentProps> = ({ name }) => {
                                 type="button"
 
                             >
-                                <p className=""><img className="h-5.5 w-5 " src={eth} alt="Your Company" /></p>
+                                <p className=""><img className="h-5.5 w-5 " src={selectedChain.iconUrl} alt="Your Company" /></p>
                                 <svg className='h-5 w-6' xmlns="http://www.w3.org/2000/svg" version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 24 24"><g><path d="M18.7 7.2c-.4-.4-1-.4-1.4 0l-7.5 7.5-3.1-3.1c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4l3.8 3.8c.2.2.4.3.7.3s.5-.1.7-.3l8.2-8.2c.4-.4.4-1 0-1.4z" fill="#919192" opacity="1" data-original="#000000"></path></g></svg>
                             </button>
 
@@ -201,7 +250,13 @@ const HeaderfullConnected: React.FC<MyComponentProps> = ({ name }) => {
 
                         </div>
 
-                        <div className="text-white text-[8px] sm:text-[16px] py-[10px] px-[12px]   rounded-full inline text-center font-normal  flex items-center gap-[8px] hover:bg-[#292929] "><img className='h-[20px] w-[20px] md:h-[24px] md:w-[24px] rounded-full' src={tc} /> <span className="font-[Lausanne] text-[12px] md:text-[15px] font-bold text-gradient ">0xFe3c...2418</span></div>
+                            <div className="text-white text-[8px] sm:text-[16px] py-[10px] px-[12px]   rounded-full inline text-center font-normal  flex items-center gap-[8px] hover:bg-[#292929] "><img className='h-[20px] w-[20px] md:h-[24px] md:w-[24px] rounded-full' src={tc} />
+                                {useAccount_.status === 'disconnected' ?
+                                    (<span className="font-[Lausanne] text-[12px] md:text-[15px] font-bold text-gradient ">...</span>) :
+                                    (<span className="font-[Lausanne] text-[12px] md:text-[15px] font-bold text-gradient ">{truncatedAddress}</span>)
+                                }
+                                
+                                    </div>
 
                     </div>
 
